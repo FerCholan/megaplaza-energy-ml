@@ -3,7 +3,7 @@ Rutas de consumo energético
 Obtener histórico y datos en tiempo real
 """
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
@@ -53,7 +53,7 @@ async def get_realtime_consumption(
     """
     Obtiene el consumo en tiempo real (últimas horas)
     """
-    cutoff_time = datetime.utcnow() - timedelta(hours=hours)
+    cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours)
     
     consumptions = db.query(Consumption).filter(
         Consumption.timestamp >= cutoff_time
@@ -89,7 +89,7 @@ async def get_consumption_stats(
     """
     from sqlalchemy import func
     
-    cutoff_time = datetime.utcnow() - timedelta(days=days)
+    cutoff_time = datetime.now(timezone.utc) - timedelta(days=days)
     
     stats = db.query(
         func.avg(Consumption.kwh).label("avg"),

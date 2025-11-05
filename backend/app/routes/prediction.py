@@ -3,7 +3,7 @@ Rutas de predicciones
 Realizar predicciones y obtener histórico
 """
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
@@ -49,7 +49,7 @@ async def predict_consumption(
         )
     
     # Guardar predicción
-    timestamp = request.timestamp or datetime.utcnow()
+    timestamp = request.timestamp or datetime.now(timezone.utc)
     db_prediction = Prediction(
         timestamp=timestamp,
         predicted_kwh=predicted_kwh,

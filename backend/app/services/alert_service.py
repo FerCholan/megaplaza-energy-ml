@@ -3,7 +3,7 @@ Servicio de alertas
 Detección de anomalías y envío de alertas
 """
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ..models.alert import Alert
@@ -39,7 +39,7 @@ class AlertService:
         """
         if kwh > self.thresholds["high_consumption"]:
             alert = Alert(
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
                 tipo="high_consumption",
                 mensaje=f"Consumo alto detectado: {kwh:.2f} kWh (umbral: {self.thresholds['high_consumption']} kWh)",
                 area=area,
@@ -70,14 +70,14 @@ class AlertService:
             Alerta si se detecta anomalía, None en caso contrario
         """
         # Calcular media de las últimas horas
-        cutoff_time = datetime.utcnow() - timedelta(hours=hours_back)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours_back)
         avg_consumption = db.query(func.avg(Consumption.kwh)).filter(
             Consumption.timestamp >= cutoff_time
         ).scalar()
         
         if avg_consumption and kwh > avg_consumption * self.thresholds["anomaly_factor"]:
             alert = Alert(
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc),
                 tipo="anomaly",
                 mensaje=f"Anomalía detectada: consumo {kwh:.2f} kWh es {kwh/avg_consumption:.1f}x mayor que la media ({avg_consumption:.2f} kWh)",
                 threshold_exceeded=kwh - avg_consumption,
