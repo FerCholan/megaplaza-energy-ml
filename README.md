@@ -67,11 +67,13 @@ Ver guía completa en [docs/SETUP.md](docs/SETUP.md)
 
 ## 📊 Dataset
 
-El sistema utiliza un dataset con ~113,000 registros que incluye:
+El sistema utiliza el dataset personalizado `datos_retail_para_modelos.csv` que debe incluir:
 - Consumo energético (kWh)
 - Variables ambientales (temperatura, viento, nubes, presión)
 - Variables temporales (hora, día, mes)
-- Características del edificio (área, medidores)
+- Características del edificio (área en pies cuadrados, año de construcción, medidores)
+
+**Para usar tu propio dataset**: Coloca el archivo `datos_retail_para_modelos.csv` en el directorio `data/raw/` y sigue la [Guía de Entrenamiento](docs/ENTRENAMIENTO.md).
 
 ## 🏗️ Arquitectura
 
@@ -102,8 +104,9 @@ megaplaza-energy-ml/
 │   │   └── evaluation.py
 │   └── models/          # Modelos entrenados
 ├── data/                 # Datos
-│   └── raw/
-│       └── energy_consumption.csv
+│   ├── raw/
+│   │   └── datos_retail_para_modelos.csv  # Tu dataset aquí
+│   └── processed/
 ├── tests/                # Tests
 ├── docs/                 # Documentación
 └── docker-compose.yml
@@ -136,6 +139,8 @@ megaplaza-energy-ml/
 
 ## 📖 Documentación
 
+- [Guía de Entrenamiento con tu Dataset](docs/ENTRENAMIENTO.md) ⭐ **¡Empieza aquí!**
+- [Guía de Uso Post-Entrenamiento](docs/USO_POST_ENTRENAMIENTO.md)
 - [Guía de Instalación](docs/SETUP.md)
 - [Documentación de la API](docs/API.md)
 - [API Interactiva](http://localhost:8000/docs) (después de iniciar)
