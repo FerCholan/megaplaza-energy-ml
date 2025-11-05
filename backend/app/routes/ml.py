@@ -3,8 +3,6 @@ Rutas de Machine Learning
 Clustering, información de modelos y re-entrenamiento
 """
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from ..database import get_db
 from ..services.ml_service import ml_service
 from ..utils.dependencies import get_current_user, get_current_admin_user
 from ..models.user import User

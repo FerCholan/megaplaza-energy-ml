@@ -5,9 +5,7 @@ Carga de modelos, predicciones y clustering
 import os
 import joblib
 import numpy as np
-import pandas as pd
-from typing import Optional, Dict, Any, List
-from datetime import datetime
+from typing import Optional, Dict, Any
 from ..config import settings
 
 

@@ -19,14 +19,14 @@ async def get_current_user(
 ) -> User:
     """
     Obtiene el usuario actual desde el token JWT
-    
+
     Args:
         token: Token JWT del usuario
         db: Sesión de base de datos
-        
+
     Returns:
         Usuario autenticado
-        
+
     Raises:
         HTTPException: Si el token es inválido o el usuario no existe
     """
@@ -35,21 +35,21 @@ async def get_current_user(
         detail="No se pudieron validar las credenciales",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     # Decodificar token
     payload = decode_access_token(token)
     if payload is None:
         raise credentials_exception
-    
+
     email: Optional[str] = payload.get("sub")
     if email is None:
         raise credentials_exception
-    
+
     # Buscar usuario en la base de datos
     user = db.query(User).filter(User.email == email).first()
     if user is None:
         raise credentials_exception
-    
+
     return user
 
 
@@ -58,13 +58,13 @@ async def get_current_admin_user(
 ) -> User:
     """
     Verifica que el usuario actual sea administrador
-    
+
     Args:
         current_user: Usuario actual
-        
+
     Returns:
         Usuario administrador
-        
+
     Raises:
         HTTPException: Si el usuario no es administrador
     """

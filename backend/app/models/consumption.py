@@ -1,7 +1,7 @@
 """
 Modelo de Consumo Energético
 """
-from sqlalchemy import Column, Integer, Float, DateTime, String
+from sqlalchemy import Column, Integer, Float, DateTime
 from sqlalchemy.sql import func
 from ..database import Base
 
