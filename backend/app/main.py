@@ -10,6 +10,7 @@ import logging
 from .config import settings
 from .database import init_db
 from .routes import auth, consumption, prediction, alerts, ml
+from .services.ml_service import ml_service
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +34,6 @@ async def lifespan(app: FastAPI):
         logger.error(f"Error inicializando base de datos: {e}")
 
     # Cargar modelos de ML
-    from .services.ml_service import ml_service
     try:
         ml_service.load_forecasting_model()
         ml_service.load_clustering_model()
