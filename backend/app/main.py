@@ -2,6 +2,7 @@
 Aplicación principal FastAPI
 Sistema de Optimización Energética para Mega Plaza Chimbote
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -9,10 +10,42 @@ import logging
 from .config import settings
 from .database import init_db
 from .routes import auth, consumption, prediction, alerts, ml
+from .services.ml_service import ml_service
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Gestión del ciclo de vida de la aplicación
+    Inicializa recursos al inicio y los libera al cierre
+    """
+    # Startup
+    logger.info("Iniciando aplicación...")
+
+    # Inicializar base de datos (crear tablas si no existen)
+    try:
+        init_db()
+        logger.info("Base de datos inicializada")
+    except Exception as e:
+        logger.error(f"Error inicializando base de datos: {e}")
+
+    # Cargar modelos de ML
+    try:
+        ml_service.load_forecasting_model()
+        ml_service.load_clustering_model()
+        logger.info("Modelos de ML cargados")
+    except Exception as e:
+        logger.warning(f"No se pudieron cargar los modelos ML: {e}")
+
+    yield
+
+    # Shutdown
+    logger.info("Cerrando aplicación...")
+
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -20,7 +53,8 @@ app = FastAPI(
     description="API para predicción y optimización de consumo energético",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Configurar CORS
@@ -31,39 +65,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-async def startup_event():
-    """
-    Evento de inicio de la aplicación
-    Inicializa la base de datos y carga los modelos
-    """
-    logger.info("Iniciando aplicación...")
-    
-    # Inicializar base de datos (crear tablas si no existen)
-    try:
-        init_db()
-        logger.info("Base de datos inicializada")
-    except Exception as e:
-        logger.error(f"Error inicializando base de datos: {e}")
-    
-    # Cargar modelos de ML
-    from .services.ml_service import ml_service
-    try:
-        ml_service.load_forecasting_model()
-        ml_service.load_clustering_model()
-        logger.info("Modelos de ML cargados")
-    except Exception as e:
-        logger.warning(f"No se pudieron cargar los modelos ML: {e}")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """
-    Evento de cierre de la aplicación
-    """
-    logger.info("Cerrando aplicación...")
 
 
 # Manejador de errores global
